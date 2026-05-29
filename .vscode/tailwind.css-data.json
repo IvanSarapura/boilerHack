@@ -1,0 +1,33 @@
+{
+  "version": 1.1,
+  "atDirectives": [
+    {
+      "name": "@custom-variant",
+      "description": "Tailwind CSS v4: define a custom variant."
+    },
+    {
+      "name": "@theme",
+      "description": "Tailwind CSS v4: define theme values inline."
+    },
+    {
+      "name": "@apply",
+      "description": "Tailwind CSS: inline utility classes."
+    },
+    {
+      "name": "@layer",
+      "description": "Tailwind CSS: cascade layer (base, components, utilities)."
+    },
+    {
+      "name": "@plugin",
+      "description": "Tailwind CSS v4: register a plugin."
+    },
+    {
+      "name": "@source",
+      "description": "Tailwind CSS v4: add content sources."
+    },
+    {
+      "name": "@import",
+      "description": "Import Tailwind or other CSS modules."
+    }
+  ]
+}

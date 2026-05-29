@@ -1,64 +1,48 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { ThemeToggle } from '@/components/theme-toggle';
+import { Button } from '@/components/ui/button';
+import { env } from '@/lib/env';
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
+    <div className="flex min-h-screen flex-col">
+      <header className="border-border flex items-center justify-between border-b px-6 py-4">
+        <span className="text-sm font-semibold tracking-tight">
+          {env.NEXT_PUBLIC_APP_NAME}
+        </span>
+        <ThemeToggle />
+      </header>
+
+      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-start justify-center gap-6 px-6 py-16">
+        <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
+          Listo para hackear.
+        </h1>
+        <p className="text-muted-foreground max-w-prose text-pretty">
+          Boilerplate frontend con Next.js 16, Tailwind v4, shadcn/ui, TanStack
+          Query, react-hook-form y Zod. Edit{' '}
+          <code className="bg-muted rounded px-1.5 py-0.5 text-sm">
+            src/app/page.tsx
+          </code>{' '}
+          y empezá a maquetar.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Button asChild>
             <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+              href="https://ui.shadcn.com/docs/components"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noreferrer"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
+              Componentes shadcn
+            </a>
+          </Button>
+          <Button variant="outline" asChild>
             <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+              href="https://tanstack.com/query/latest/docs/framework/react/overview"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noreferrer"
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+              TanStack Query
+            </a>
+          </Button>
         </div>
       </main>
     </div>
