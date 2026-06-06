@@ -2,6 +2,9 @@
   "name": "boilerhack",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,7 +12,16 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "backend:install": "uv sync --directory backend",
+    "backend:dev": "uv run --directory backend uvicorn app.main:app --reload --port 8000",
+    "backend:migrate": "uv run --directory backend alembic upgrade head",
+    "backend:seed": "uv run --directory backend python -m app.seed",
+    "backend:test": "uv run --directory backend pytest -q",
+    "backend:lint": "uv run --directory backend ruff check .",
+    "db:up": "docker compose -f backend/docker-compose.yml up -d",
+    "db:down": "docker compose -f backend/docker-compose.yml down",
+    "dev:all": "concurrently -n web,api -c blue,green \"npm run dev\" \"npm run backend:dev\""
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
@@ -35,6 +47,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
+    "concurrently": "^9.1.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "eslint-config-prettier": "^10.1.8",

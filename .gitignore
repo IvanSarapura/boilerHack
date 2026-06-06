@@ -43,3 +43,11 @@ next-env.d.ts
 
 # agents
 .agents
+
+# python backend
+backend/.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+backend/*.db

@@ -7,11 +7,14 @@ Boilerplate frontend liviano para hackathons. Pensado para construir un MVP en 4
 - **Next.js 16** (App Router) + **React 19** + **TypeScript** estricto + React Compiler
 - **Tailwind CSS v4** + **shadcn/ui** (componentes copy-paste que viven en `src/components/ui/`)
 - **next-themes** para dark mode con persistencia
-- **TanStack Query** para hablar con el backend de tus compañeros
+- **TanStack Query** para hablar con el backend
 - **react-hook-form** + **Zod** para formularios validados
 - **sonner** para toasts, **lucide-react** para iconos
+- **Backend FastAPI** opcional en `backend/` (Python, agnóstico al motor de BD) — ver [`backend/README.md`](backend/README.md)
 
 ## Arrancar
+
+Solo frontend:
 
 ```bash
 npm install
@@ -19,7 +22,17 @@ cp .env.example .env.local   # ajustá la URL del backend
 npm run dev
 ```
 
-Abrí <http://localhost:3000>.
+Frontend + backend FastAPI (los dos a la vez):
+
+```bash
+npm install
+npm run backend:install          # instala deps Python con uv
+cp backend/.env.example backend/.env
+npm run backend:migrate          # crea las tablas (SQLite por defecto, sin Docker)
+npm run dev:all                  # web en :3000 + API en :8000
+```
+
+Abrí <http://localhost:3000> (demo CRUD en <http://localhost:3000/items>) y la API en <http://localhost:8000/docs>.
 
 ## Estructura
 
@@ -33,11 +46,15 @@ src/
     ui/               # Componentes shadcn — los modificás libremente
     providers/        # ThemeProvider y QueryProvider
     theme-toggle.tsx
+  features/           # Features con backend (api + hooks + schemas + componentes)
+    items/            # Ejemplo CRUD end-to-end — copialo para tus recursos
   hooks/              # Tus hooks custom
   lib/
     api/client.ts     # apiClient<T>() tipado + ApiError
     env.ts            # Variables de entorno validadas con Zod
     utils.ts          # cn() para clases Tailwind
+
+backend/              # API FastAPI agnóstica al motor (ver backend/README.md)
 ```
 
 ## Cómo hacer cosas
@@ -145,23 +162,47 @@ export function LoginForm() {
 }
 ```
 
+### Crear un recurso con backend
+
+La feature `src/features/items/` es la plantilla de referencia. Para un recurso nuevo, copiala y renombrá:
+
+```
+src/features/<recurso>/
+  schemas.ts    # Zod, espejo 1:1 de los esquemas Pydantic del backend
+  api.ts        # funciones que llaman a apiClient con env.NEXT_PUBLIC_API_URL
+  hooks.ts      # hooks de TanStack Query (useQuery / useMutation + invalidación)
+  components/   # UI que consume los hooks
+```
+
+Del lado del backend, copiá el slice de `items` (model → schemas → repository → service → router). Ver [`backend/README.md`](backend/README.md).
+
 ### Agregar una variable de entorno
 
 1. Definila en `.env.local`
 2. Sumá la validación en `src/lib/env.ts`
 3. Importá desde `@/lib/env` (no uses `process.env` directo en el código)
 
+> Variables del backend (secrets, `DATABASE_URL`): van en `backend/.env`, **no** en el frontend. Nunca uses el prefijo `NEXT_PUBLIC_` para secrets.
+
 ## Scripts
 
-| Comando                | Qué hace                                           |
-| ---------------------- | -------------------------------------------------- |
-| `npm run dev`          | Server de desarrollo                               |
-| `npm run build`        | Build de producción                                |
-| `npm run start`        | Sirve el build de producción                       |
-| `npm run lint`         | ESLint                                             |
-| `npm run typecheck`    | `tsc --noEmit` — chequeo de tipos sin generar dist |
-| `npm run format`       | Prettier en todo el repo (modificación)            |
-| `npm run format:check` | Verifica formato sin tocar archivos (lo usa CI)    |
+| Comando                     | Qué hace                                           |
+| --------------------------- | -------------------------------------------------- |
+| `npm run dev`               | Server de desarrollo                               |
+| `npm run build`             | Build de producción                                |
+| `npm run start`             | Sirve el build de producción                       |
+| `npm run lint`              | ESLint                                             |
+| `npm run typecheck`         | `tsc --noEmit` — chequeo de tipos sin generar dist |
+| `npm run format`            | Prettier en todo el repo (modificación)            |
+| `npm run format:check`      | Verifica formato sin tocar archivos (lo usa CI)    |
+| `npm run dev:all`           | Frontend (:3000) + backend FastAPI (:8000) juntos  |
+| `npm run backend:dev`       | Solo la API FastAPI con reload                     |
+| `npm run backend:migrate`   | Aplica migraciones Alembic                         |
+| `npm run backend:seed`      | Datos demo en la BD                                |
+| `npm run backend:test`      | Tests del backend (pytest)                         |
+| `npm run db:up` / `db:down` | Levanta/baja PostgreSQL con Docker Compose         |
+
+Los scripts `backend:*` usan [uv](https://docs.astral.sh/uv/). Instalalo con `curl -LsSf https://astral.sh/uv/install.sh | sh` si no lo tenés.
 
 ## CI
 
@@ -169,7 +210,8 @@ Hay un workflow en `.github/workflows/ci.yml` que corre `format:check + lint + t
 
 ## Decisiones de diseño
 
-- **Sin Storybook, sin tests, sin Husky.** Cero fricción durante un hackathon. Si querés deploy con preview en cada PR, usá Vercel directo desde GitHub.
+- **Frontend sin Storybook ni Husky.** Cero fricción durante un hackathon. Si querés deploy con preview en cada PR, usá Vercel directo desde GitHub.
 - **shadcn vs componentes propios:** lo que se instala con `shadcn add` se queda en tu repo, lo editás como cualquier archivo.
 - **Tailwind v4:** todo configurado en `globals.css` con `@import 'tailwindcss'`. No hay `tailwind.config.js`.
 - **`apiClient` con Zod opcional:** validá las respuestas críticas del backend (login, payment); para endpoints simples podés omitir `schema`.
+- **Backend desacoplado y agnóstico al motor.** FastAPI separado en `:8000` con SQLAlchemy detrás de un patrón repositorio: cambiás de SQLite a Postgres/MySQL/SQL Server con una sola variable. Trae tests (pytest) porque la lógica de datos sí conviene cubrirla.

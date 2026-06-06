@@ -1,0 +1,24 @@
+# Levanta PostgreSQL 16 para desarrollo local.
+# Uso: npm run db:up  (desde la raíz del repo)
+# Luego pon en backend/.env:
+#   DATABASE_URL=postgresql+asyncpg://boilerhack:boilerhack@localhost:5432/boilerhack
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: boilerhack-db
+    environment:
+      POSTGRES_USER: boilerhack
+      POSTGRES_PASSWORD: boilerhack
+      POSTGRES_DB: boilerhack
+    ports:
+      - "5432:5432"
+    volumes:
+      - boilerhack_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U boilerhack"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  boilerhack_pgdata:
